@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.tileverse</groupId>
+  <artifactId>cloud-dependencies-bom</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+  <name>Cloud Dependencies BOM</name>
+  <description>Bill of Materials (BOM) for cloud storage SDK dependencies (AWS S3, Azure Blob Storage, Google Cloud Storage) with Netty exclusions and dependency convergence overrides. Single source of truth for tileverse, imageio-ext, geotools, geowebcache, and geoserver.</description>
+  <url>https://github.com/tileverse-io/cloud-dependencies-bom</url>
+
+  <licenses>
+    <license>
+      <name>Apache License 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <email>gabriel.roldan@gmail.com</email>
+      <organization>Multiversio LLC</organization>
+      <organizationUrl>https://multivers.io</organizationUrl>
+    </developer>
+  </developers>
+
+  <modules>
+    <module>verification</module>
+  </modules>
+
+  <scm>
+    <connection>scm:git:https://github.com/tileverse-io/cloud-dependencies-bom.git</connection>
+    <developerConnection>scm:git:https://github.com/tileverse-io/cloud-dependencies-bom.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/tileverse-io/cloud-dependencies-bom</url>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/tileverse-io/cloud-dependencies-bom/issues</url>
+  </issueManagement>
+
+  <distributionManagement>
+    <repository>
+      <id>central</id>
+      <url>https://central.sonatype.com/api/v1/publisher/deployments/upload</url>
+    </repository>
+    <snapshotRepository>
+      <id>central</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <properties>
+    <!-- CI-friendly version management -->
+    <revision>1.0-SNAPSHOT</revision>
+
+    <!-- Build properties -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Skip GPG signing by default (enabled during publishing) -->
+    <gpg.skip>true</gpg.skip>
+
+    <!-- Default formatter/linter properties, see the qa profile -->
+    <sortpom.skip>false</sortpom.skip>
+    <sortpom.action>sort</sortpom.action>
+
+    <!-- Cloud SDK versions -->
+    <aws-sdk.version>2.41.31</aws-sdk.version>
+    <azure-storage-blob.version>12.32.0</azure-storage-blob.version>
+    <azure-identity.version>1.18.1</azure-identity.version>
+    <azure-core-http-jdk-httpclient.version>1.1.2</azure-core-http-jdk-httpclient.version>
+    <google-cloud-storage.version>2.63.0</google-cloud-storage.version>
+
+    <!-- Dependency convergence overrides -->
+    <jackson2.version>2.20.0</jackson2.version>
+    <error-prone-annotations.version>2.45.0</error-prone-annotations.version>
+    <jna.version>5.18.1</jna.version>
+    <msal4j.version>1.23.1</msal4j.version>
+    <slf4j.version>2.0.17</slf4j.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- ================================================================= -->
+      <!-- BOMs (imported first)                                             -->
+      <!-- ================================================================= -->
+      <dependency>
+        <!-- jackson 2 required for dependencyConvergence since azure-storage-blob pulls in conflicting versions -->
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson2.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-storage-bom</artifactId>
+        <version>${google-cloud-storage.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- ================================================================= -->
+      <!-- Azure                                                             -->
+      <!-- ================================================================= -->
+      <dependency>
+        <groupId>com.azure</groupId>
+        <artifactId>azure-storage-blob</artifactId>
+        <version>${azure-storage-blob.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- exclude netty, we don't want all the transitive dependencies, will use azure-core-http-jdk-httpclient instead-->
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core-http-netty</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!--
+        JDK HttpClient
+        see https://learn.microsoft.com/en-us/azure/developer/java/sdk/http-client-pipeline
+            Ensure dependency convergence on com.azure:azure-core by checking
+            https://mvnrepository.com/artifact/com.azure/azure-core-http-jdk-httpclient
+        -->
+        <groupId>com.azure</groupId>
+        <artifactId>azure-core-http-jdk-httpclient</artifactId>
+        <version>${azure-core-http-jdk-httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.azure</groupId>
+        <artifactId>azure-identity</artifactId>
+        <version>${azure-identity.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- exclude netty, we don't want all the transitive dependencies, will use azure-core-http-jdk-httpclient instead-->
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core-http-netty</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- ================================================================= -->
+      <!-- AWS                                                               -->
+      <!-- ================================================================= -->
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>s3</artifactId>
+        <version>${aws-sdk.version}</version>
+        <exclusions>
+          <exclusion>
+            <!--
+              Exclude netty, we don't want all the transitive dependencies.
+
+              Use software.amazon.awssdk:aws-crt-client instead, which provides sync and async alternative clients
+              AwsCrtHttpClient implements SdkHttpClient
+              AwsCrtAsyncHttpClient implements SdkAsyncHttpClient
+
+              For the blocking client, there's also software.amazon.awssdk:apache-client -> org.apache.httpcomponents:httpclient,
+              but the crt-client provides good alternatives for both.
+
+              <quote>
+              The AWS CRT-based S3 client improves transfer reliability in case there is a network failure.
+              Reliability is improved by retrying individual failed parts of a file transfer without restarting
+              the transfer from the beginning.
+
+              In addition, the AWS CRT-based S3 client offers enhanced connection pooling and
+              Domain Name System (DNS)load balancing, which also improves throughput.
+
+              You can use the AWS CRT-based S3 client in place of the SDK's standard S3 asynchronous
+              client and take advantage of its improved throughput right away.
+              </quote>
+              See https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/crt-based-s3-client.html
+            -->
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>aws-crt-client</artifactId>
+        <version>${aws-sdk.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>auth</artifactId>
+        <version>${aws-sdk.version}</version>
+      </dependency>
+      <!-- S3 specific authentication methods -->
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>sts</artifactId>
+        <version>${aws-sdk.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- exclude netty, we don't want all the transitive dependencies -->
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>sso</artifactId>
+        <version>${aws-sdk.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- exclude netty, we don't want all the transitive dependencies, use aws-crt-client instead -->
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <!-- exclude apache-client, we don't want all the transitive dependencies, use aws-crt-client instead -->
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- ================================================================= -->
+      <!-- Dependency convergence overrides                                  -->
+      <!-- ================================================================= -->
+      <dependency>
+        <!--
+          Convergence error between caffeine -> error_prone_annotations and google-cloud-storage -> error_prone_annotations
+        -->
+        <groupId>com.google.errorprone</groupId>
+        <artifactId>error_prone_annotations</artifactId>
+        <version>${error-prone-annotations.version}</version>
+      </dependency>
+      <dependency>
+        <!--
+          Convergence error between azure-identity -> msal4j-persistence-extension -> jna and azure-identity -> jna
+        -->
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>${jna.version}</version>
+      </dependency>
+      <dependency>
+        <!--
+          Convergence error between azure-identity -> msal4j-persistence-extension -> jna-platform and azure-identity -> jna-platform
+        -->
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna-platform</artifactId>
+        <version>${jna.version}</version>
+      </dependency>
+      <dependency>
+        <!--
+          Convergence error between azure/aws -> slf4j-api:1.7.x and google-cloud-storage -> slf4j-api:2.0.x
+        -->
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <!--
+          Convergence error between azure-identity -> msal4j and azure-identity -> msal4j-persistence-extension -> msal4j
+        -->
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>msal4j</artifactId>
+        <version>${msal4j.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- let azure-json version be managed by azure-storage-blob -> azure-core -> azure-json -->
+            <groupId>com.azure</groupId>
+            <artifactId>azure-json</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <!-- Maven Enforcer -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>enforce-rules</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.9.0,)</version>
+                  <message>Maven 3.9.0 or newer is required</message>
+                </requireMavenVersion>
+                <requireReleaseDeps>
+                  <onlyWhenRelease>true</onlyWhenRelease>
+                  <searchTransitive>true</searchTransitive>
+                </requireReleaseDeps>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- POM file organization with SortPOM -->
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <version>4.0.0</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <keepBlankLines>true</keepBlankLines>
+          <spaceBeforeCloseEmptyElement>false</spaceBeforeCloseEmptyElement>
+          <createBackupFile>false</createBackupFile>
+          <lineSeparator>\n</lineSeparator>
+          <verifyFail>stop</verifyFail>
+          <verifyFailOn>strict</verifyFailOn>
+          <skip>${sortpom.skip}</skip>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>${sortpom.action}</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Flatten POM for CI-friendly versioning -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>ossrh</flattenMode>
+          <pomElements>
+            <!--
+            Take the element from the interpolated POM (original POM with variables interpolated).
+            This avoids adding dependencies defined in a parent pom.
+            -->
+            <dependencyManagement>interpolate</dependencyManagement>
+          </pomElements>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+            <phase>process-resources</phase>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>clean</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Central Portal Publishing -->
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.8.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <deploymentName>Cloud Dependencies BOM</deploymentName>
+          <autoPublish>true</autoPublish>
+          <waitUntil>published</waitUntil>
+          <excludeArtifacts>
+            <excludeArtifact>cloud-dependencies-bom-verification</excludeArtifact>
+          </excludeArtifacts>
+        </configuration>
+      </plugin>
+
+      <!-- GPG Signing (only when publishing) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.2.8</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <skip>${gpg.skip}</skip>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>qa</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>qa</name>
+        </property>
+      </activation>
+      <properties>
+        <sortpom.action>verify</sortpom.action>
+      </properties>
+    </profile>
+
+    <profile>
+      <!--
+      Enforce dependencyConvergence rule to make sure there are no duplicate
+      dependencies with conflicting version numbers
+      -->
+      <id>dependencyConvergence</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>!skipDependencyConvergence</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>enforce-dependency-convergence</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <dependencyConvergence>
+                      <excludedScopes>test</excludedScopes>
+                    </dependencyConvergence>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
