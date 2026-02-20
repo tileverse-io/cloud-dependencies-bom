@@ -374,13 +374,14 @@
       <plugin>
         <groupId>org.sonatype.central</groupId>
         <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.8.0</version>
+        <version>0.10.0</version>
         <extensions>true</extensions>
         <configuration>
           <publishingServerId>central</publishingServerId>
           <deploymentName>Cloud Dependencies BOM</deploymentName>
           <autoPublish>true</autoPublish>
           <waitUntil>published</waitUntil>
+          <waitMaxTime>3600</waitMaxTime>
           <excludeArtifacts>
             <excludeArtifact>cloud-dependencies-bom-verification</excludeArtifact>
           </excludeArtifacts>
