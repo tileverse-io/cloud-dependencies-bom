@@ -26,6 +26,10 @@
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>
+      <artifactId>azure-storage-blob-batch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.azure</groupId>
       <artifactId>azure-core-http-jdk-httpclient</artifactId>
     </dependency>
     <dependency>
