@@ -69,10 +69,13 @@
     <sortpom.action>sort</sortpom.action>
 
     <!-- Cloud SDK versions -->
-    <aws-sdk.version>2.41.31</aws-sdk.version>
+    <aws-sdk.version>2.41.32</aws-sdk.version>
+    <azure-sdk-bom.version>1.3.3</azure-sdk-bom.version>
+    <!-- Azure artifact versions must match azure-sdk-bom ${azure-sdk-bom.version} -->
     <azure-storage-blob.version>12.32.0</azure-storage-blob.version>
+    <azure-storage-blob-batch.version>12.28.0</azure-storage-blob-batch.version>
     <azure-identity.version>1.18.1</azure-identity.version>
-    <azure-core-http-jdk-httpclient.version>1.1.2</azure-core-http-jdk-httpclient.version>
+
     <google-cloud-storage.version>2.63.0</google-cloud-storage.version>
 
     <!-- Dependency convergence overrides -->
@@ -97,9 +100,23 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>com.azure</groupId>
+        <artifactId>azure-sdk-bom</artifactId>
+        <version>${azure-sdk-bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>com.google.cloud</groupId>
         <artifactId>google-cloud-storage-bom</artifactId>
         <version>${google-cloud-storage.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws-sdk.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -120,15 +137,16 @@
         </exclusions>
       </dependency>
       <dependency>
-        <!--
-        JDK HttpClient
-        see https://learn.microsoft.com/en-us/azure/developer/java/sdk/http-client-pipeline
-            Ensure dependency convergence on com.azure:azure-core by checking
-            https://mvnrepository.com/artifact/com.azure/azure-core-http-jdk-httpclient
-        -->
         <groupId>com.azure</groupId>
-        <artifactId>azure-core-http-jdk-httpclient</artifactId>
-        <version>${azure-core-http-jdk-httpclient.version}</version>
+        <artifactId>azure-storage-blob-batch</artifactId>
+        <version>${azure-storage-blob-batch.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- exclude netty, we don't want all the transitive dependencies, will use azure-core-http-jdk-httpclient instead-->
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core-http-netty</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.azure</groupId>
@@ -183,16 +201,6 @@
             <artifactId>apache-client</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>aws-crt-client</artifactId>
-        <version>${aws-sdk.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>auth</artifactId>
-        <version>${aws-sdk.version}</version>
       </dependency>
       <!-- S3 specific authentication methods -->
       <dependency>

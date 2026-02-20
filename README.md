@@ -46,18 +46,19 @@ For snapshot versions, add the Central Portal Snapshots repository:
 | Artifact | Version | Notes |
 |----------|---------|-------|
 | `com.azure:azure-storage-blob` | 12.32.0 | Netty excluded |
-| `com.azure:azure-core-http-jdk-httpclient` | 1.1.2 | JDK HttpClient replacement for Netty |
+| `com.azure:azure-storage-blob-batch` | 12.28.0 | Netty excluded |
+| `com.azure:azure-core-http-jdk-httpclient` | (from BOM) | JDK HttpClient replacement for Netty |
 | `com.azure:azure-identity` | 1.18.1 | Netty excluded |
 
 ### AWS
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `software.amazon.awssdk:s3` | 2.41.31 | Netty and Apache HTTP excluded |
-| `software.amazon.awssdk:aws-crt-client` | 2.41.31 | CRT-based replacement for Netty |
-| `software.amazon.awssdk:auth` | 2.41.31 | |
-| `software.amazon.awssdk:sts` | 2.41.31 | Netty and Apache HTTP excluded |
-| `software.amazon.awssdk:sso` | 2.41.31 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:s3` | 2.41.32 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:aws-crt-client` | 2.41.32 | CRT-based replacement for Netty (version from AWS SDK BOM) |
+| `software.amazon.awssdk:auth` | 2.41.32 | Version from AWS SDK BOM |
+| `software.amazon.awssdk:sts` | 2.41.32 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:sso` | 2.41.32 | Netty and Apache HTTP excluded |
 
 ### Google Cloud Storage
 
@@ -69,8 +70,10 @@ For snapshot versions, add the Central Portal Snapshots repository:
 
 | BOM | Version | Notes |
 |-----|---------|-------|
+| `com.azure:azure-sdk-bom` | 1.3.3 | Azure SDK version management |
 | `com.fasterxml.jackson:jackson-bom` | 2.20.0 | Azure convergence fix |
 | `com.google.cloud:google-cloud-storage-bom` | 2.63.0 | GCS and transitive deps |
+| `software.amazon.awssdk:bom` | 2.41.32 | AWS SDK version management |
 
 ### Dependency Convergence Overrides
 
