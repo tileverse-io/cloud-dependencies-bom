@@ -76,7 +76,7 @@
     <azure-storage-blob-batch.version>12.28.0</azure-storage-blob-batch.version>
     <azure-identity.version>1.18.1</azure-identity.version>
 
-    <google-cloud-storage.version>2.63.0</google-cloud-storage.version>
+    <google-cloud-storage.version>2.67.0</google-cloud-storage.version>
 
     <!-- Dependency convergence overrides -->
     <jackson2.version>2.21.0</jackson2.version>
