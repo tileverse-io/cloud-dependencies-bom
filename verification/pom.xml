@@ -30,6 +30,10 @@
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>
+      <artifactId>azure-storage-file-datalake</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.azure</groupId>
       <artifactId>azure-core-http-jdk-httpclient</artifactId>
     </dependency>
     <dependency>

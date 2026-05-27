@@ -74,6 +74,7 @@
     <!-- Azure artifact versions must match azure-sdk-bom ${azure-sdk-bom.version} -->
     <azure-storage-blob.version>12.32.0</azure-storage-blob.version>
     <azure-storage-blob-batch.version>12.28.0</azure-storage-blob-batch.version>
+    <azure-storage-file-datalake.version>12.25.0</azure-storage-file-datalake.version>
     <azure-identity.version>1.18.1</azure-identity.version>
 
     <google-cloud-storage.version>2.67.0</google-cloud-storage.version>
@@ -122,6 +123,122 @@
       </dependency>
 
       <!-- ================================================================= -->
+      <!-- Google Cloud                                                      -->
+      <!-- ================================================================= -->
+      <dependency>
+        <!-- HTTP/JSON transport only: exclude the gRPC stack (grpc-netty-shaded etc.). -->
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-storage</artifactId>
+        <version>${google-cloud-storage.version}</version>
+        <exclusions>
+          <!--
+            Exclude the gRPC transport artifacts but KEEP io.grpc:grpc-api: the HTTP/JSON path
+            (gax core) references io.grpc.Context at runtime, which lives in grpc-api as of
+            gRPC 1.80 (grpc-context is now an empty legacy jar). grpc-api is API-only (no Netty,
+            no grpc-core impl; deps are guava/jsr305/error_prone). The heavy artifacts
+            (grpc-netty-shaded, grpc-core, grpc-xds, ...) are the ones we are shedding.
+          -->
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-alts</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-auth</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-googleapis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-grpclb</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-inprocess</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-opentelemetry</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf-lite</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-rls</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-services</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-util</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-xds</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.api</groupId>
+            <artifactId>gax-grpc</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-core-grpc</artifactId>
+          </exclusion>
+          <!--
+            KEEP proto-google-cloud-storage-v2: the HTTP/JSON path references the v2 proto model
+            classes (e.g. com.google.storage.v2.BucketName). It pulls only protobuf + proto-google-*
+            (no gRPC transport). The gRPC client stubs below (grpc-/gapic-) are the parts we drop.
+          -->
+          <exclusion>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>grpc-google-cloud-storage-v2</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>gapic-google-cloud-storage-v2</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>proto-google-cloud-monitoring-v3</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.cloud.opentelemetry</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>io.opentelemetry.contrib</groupId>
+            <artifactId>opentelemetry-gcp-resources</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.re2j</groupId>
+            <artifactId>re2j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <!-- ================================================================= -->
       <!-- Azure                                                             -->
       <!-- ================================================================= -->
       <dependency>
@@ -152,6 +269,18 @@
         <groupId>com.azure</groupId>
         <artifactId>azure-identity</artifactId>
         <version>${azure-identity.version}</version>
+        <exclusions>
+          <exclusion>
+            <!-- exclude netty, we don't want all the transitive dependencies, will use azure-core-http-jdk-httpclient instead-->
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core-http-netty</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.azure</groupId>
+        <artifactId>azure-storage-file-datalake</artifactId>
+        <version>${azure-storage-file-datalake.version}</version>
         <exclusions>
           <exclusion>
             <!-- exclude netty, we don't want all the transitive dependencies, will use azure-core-http-jdk-httpclient instead-->
@@ -313,6 +442,22 @@
                   <onlyWhenRelease>true</onlyWhenRelease>
                   <searchTransitive>true</searchTransitive>
                 </requireReleaseDeps>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>io.grpc:*</exclude>
+                    <exclude>io.netty:*</exclude>
+                    <exclude>com.google.api:gax-grpc</exclude>
+                    <exclude>com.azure:azure-core-http-netty</exclude>
+                  </excludes>
+                  <includes>
+                    <!-- grpc-api carries io.grpc.Context, required by the GCS HTTP/JSON path (gax); it is API-only, no Netty. -->
+                    <include>io.grpc:grpc-api</include>
+                    <!-- grpc-context is an empty legacy jar in gRPC 1.80+; harmless if gax still drags it in. -->
+                    <include>io.grpc:grpc-context</include>
+                  </includes>
+                  <searchTransitive>true</searchTransitive>
+                  <message>gRPC transport (everything except the API-only grpc-api/grpc-context) and Netty are banned. GCS uses the HTTP/JSON transport and Azure uses azure-core-http-jdk-httpclient; do not let an SDK upgrade re-introduce them.</message>
+                </bannedDependencies>
               </rules>
             </configuration>
           </execution>
