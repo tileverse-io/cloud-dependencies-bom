@@ -45,11 +45,11 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout cloud-dependencies-bom
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: cloud-dependencies-bom
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: "17"
           distribution: "temurin"
@@ -67,7 +67,7 @@ jobs:
             echo "version=$(./mvnw -q -B -ntp help:evaluate -Dexpression=revision -DforceStdout)" >> "$GITHUB_OUTPUT"
           fi
       - name: Checkout imageio-ext
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: geosolutions-it/imageio-ext
           ref: ${{ inputs.imageio-ext-ref || 'master' }}
@@ -101,11 +101,11 @@ jobs:
             profiles: "online"
     steps:
       - name: Checkout cloud-dependencies-bom
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: cloud-dependencies-bom
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: "17"
           distribution: "temurin"
@@ -123,7 +123,7 @@ jobs:
             echo "version=$(./mvnw -q -B -ntp help:evaluate -Dexpression=revision -DforceStdout)" >> "$GITHUB_OUTPUT"
           fi
       - name: Checkout geowebcache
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: GeoWebCache/geowebcache
           ref: ${{ inputs.geowebcache-ref || 'main' }}
@@ -142,11 +142,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout cloud-dependencies-bom
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: cloud-dependencies-bom
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: "21"
           distribution: "temurin"
@@ -164,7 +164,7 @@ jobs:
             echo "version=$(./mvnw -q -B -ntp help:evaluate -Dexpression=revision -DforceStdout)" >> "$GITHUB_OUTPUT"
           fi
       - name: Checkout tileverse
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: tileverse-io/tileverse
           ref: ${{ inputs.tileverse-ref || 'main' }}
