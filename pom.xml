@@ -80,7 +80,7 @@
     <google-cloud-storage.version>2.67.0</google-cloud-storage.version>
 
     <!-- Dependency convergence overrides -->
-    <jackson2.version>2.21.0</jackson2.version>
+    <jackson2.version>2.22.2</jackson2.version>
     <error-prone-annotations.version>2.45.0</error-prone-annotations.version>
     <jna.version>5.18.1</jna.version>
     <msal4j.version>1.23.1</msal4j.version>
@@ -493,7 +493,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.6.0</version>
+        <version>1.8.0</version>
         <configuration>
           <updatePomFile>true</updatePomFile>
           <flattenMode>ossrh</flattenMode>
