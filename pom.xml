@@ -69,22 +69,22 @@
     <sortpom.action>sort</sortpom.action>
 
     <!-- Cloud SDK versions -->
-    <aws-sdk.version>2.41.32</aws-sdk.version>
-    <azure-sdk-bom.version>1.3.3</azure-sdk-bom.version>
+    <aws-sdk.version>2.54.16</aws-sdk.version>
+    <azure-sdk-bom.version>1.3.8</azure-sdk-bom.version>
     <!-- Azure artifact versions must match azure-sdk-bom ${azure-sdk-bom.version} -->
-    <azure-storage-blob.version>12.32.0</azure-storage-blob.version>
-    <azure-storage-blob-batch.version>12.28.0</azure-storage-blob-batch.version>
-    <azure-storage-file-datalake.version>12.25.0</azure-storage-file-datalake.version>
-    <azure-identity.version>1.18.1</azure-identity.version>
+    <azure-storage-blob.version>12.35.0</azure-storage-blob.version>
+    <azure-storage-blob-batch.version>12.31.0</azure-storage-blob-batch.version>
+    <azure-storage-file-datalake.version>12.28.0</azure-storage-file-datalake.version>
+    <azure-identity.version>1.18.4</azure-identity.version>
 
-    <google-cloud-storage.version>2.67.0</google-cloud-storage.version>
+    <google-cloud-storage.version>2.73.0</google-cloud-storage.version>
 
     <!-- Dependency convergence overrides -->
     <jackson2.version>2.22.2</jackson2.version>
-    <error-prone-annotations.version>2.45.0</error-prone-annotations.version>
-    <jna.version>5.18.1</jna.version>
+    <error-prone-annotations.version>2.50.0</error-prone-annotations.version>
+    <jna.version>5.19.1</jna.version>
     <msal4j.version>1.23.1</msal4j.version>
-    <slf4j.version>2.0.17</slf4j.version>
+    <slf4j.version>2.0.19</slf4j.version>
   </properties>
 
   <dependencyManagement>
@@ -329,6 +329,11 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>apache-client</artifactId>
           </exclusion>
+          <exclusion>
+            <!-- AWS SDK 2.54+ ships apache5-client (Apache HttpClient 5) as the default sync transport in place of apache-client -->
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache5-client</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- S3 specific authentication methods -->
@@ -346,6 +351,10 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>apache-client</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache5-client</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -362,6 +371,10 @@
             <!-- exclude apache-client, we don't want all the transitive dependencies, use aws-crt-client instead -->
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>apache-client</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache5-client</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -448,6 +461,8 @@
                     <exclude>io.netty:*</exclude>
                     <exclude>com.google.api:gax-grpc</exclude>
                     <exclude>com.azure:azure-core-http-netty</exclude>
+                    <exclude>software.amazon.awssdk:apache-client</exclude>
+                    <exclude>software.amazon.awssdk:apache5-client</exclude>
                   </excludes>
                   <includes>
                     <!-- grpc-api carries io.grpc.Context, required by the GCS HTTP/JSON path (gax); it is API-only, no Netty. -->
@@ -456,7 +471,7 @@
                     <include>io.grpc:grpc-context</include>
                   </includes>
                   <searchTransitive>true</searchTransitive>
-                  <message>gRPC transport (everything except the API-only grpc-api/grpc-context) and Netty are banned. GCS uses the HTTP/JSON transport and Azure uses azure-core-http-jdk-httpclient; do not let an SDK upgrade re-introduce them.</message>
+                  <message>gRPC transport (everything except the API-only grpc-api/grpc-context), Netty and the AWS Apache HttpClient transports are banned. GCS uses the HTTP/JSON transport, Azure uses azure-core-http-jdk-httpclient and AWS uses aws-crt-client; do not let an SDK upgrade re-introduce them.</message>
                 </bannedDependencies>
               </rules>
             </configuration>
