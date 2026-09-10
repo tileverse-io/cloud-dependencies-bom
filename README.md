@@ -45,45 +45,46 @@ For snapshot versions, add the Central Portal Snapshots repository:
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `com.azure:azure-storage-blob` | 12.32.0 | Netty excluded |
-| `com.azure:azure-storage-blob-batch` | 12.28.0 | Netty excluded |
+| `com.azure:azure-storage-blob` | 12.35.0 | Netty excluded |
+| `com.azure:azure-storage-blob-batch` | 12.31.0 | Netty excluded |
+| `com.azure:azure-storage-file-datalake` | 12.28.0 | Netty excluded |
 | `com.azure:azure-core-http-jdk-httpclient` | (from BOM) | JDK HttpClient replacement for Netty |
-| `com.azure:azure-identity` | 1.18.1 | Netty excluded |
+| `com.azure:azure-identity` | 1.18.4 | Netty excluded |
 
 ### AWS
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `software.amazon.awssdk:s3` | 2.41.32 | Netty and Apache HTTP excluded |
-| `software.amazon.awssdk:aws-crt-client` | 2.41.32 | CRT-based replacement for Netty (version from AWS SDK BOM) |
-| `software.amazon.awssdk:auth` | 2.41.32 | Version from AWS SDK BOM |
-| `software.amazon.awssdk:sts` | 2.41.32 | Netty and Apache HTTP excluded |
-| `software.amazon.awssdk:sso` | 2.41.32 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:s3` | 2.54.16 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:aws-crt-client` | 2.54.16 | CRT-based replacement for Netty (version from AWS SDK BOM) |
+| `software.amazon.awssdk:auth` | 2.54.16 | Version from AWS SDK BOM |
+| `software.amazon.awssdk:sts` | 2.54.16 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:sso` | 2.54.16 | Netty and Apache HTTP excluded |
 
 ### Google Cloud Storage
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `com.google.cloud:google-cloud-storage-bom` | 2.63.0 | Imported BOM |
+| `com.google.cloud:google-cloud-storage-bom` | 2.73.0 | Imported BOM |
 
 ### Imported BOMs
 
 | BOM | Version | Notes |
 |-----|---------|-------|
-| `com.azure:azure-sdk-bom` | 1.3.3 | Azure SDK version management |
-| `com.fasterxml.jackson:jackson-bom` | 2.20.0 | Azure convergence fix |
-| `com.google.cloud:google-cloud-storage-bom` | 2.63.0 | GCS and transitive deps |
-| `software.amazon.awssdk:bom` | 2.41.32 | AWS SDK version management |
+| `com.azure:azure-sdk-bom` | 1.3.8 | Azure SDK version management |
+| `com.fasterxml.jackson:jackson-bom` | 2.22.2 | Azure convergence fix |
+| `com.google.cloud:google-cloud-storage-bom` | 2.73.0 | GCS and transitive deps |
+| `software.amazon.awssdk:bom` | 2.54.16 | AWS SDK version management |
 
 ### Dependency Convergence Overrides
 
 | Artifact | Version | Reason |
 |----------|---------|--------|
-| `com.google.errorprone:error_prone_annotations` | 2.45.0 | caffeine vs google-cloud-storage conflict |
-| `net.java.dev.jna:jna` | 5.18.1 | azure-identity transitive conflict |
-| `net.java.dev.jna:jna-platform` | 5.18.1 | azure-identity transitive conflict |
+| `com.google.errorprone:error_prone_annotations` | 2.50.0 | caffeine vs google-cloud-storage conflict |
+| `net.java.dev.jna:jna` | 5.19.1 | azure-identity transitive conflict |
+| `net.java.dev.jna:jna-platform` | 5.19.1 | azure-identity transitive conflict |
 | `com.microsoft.azure:msal4j` | 1.23.1 | azure-identity vs msal4j-persistence-extension conflict |
-| `org.slf4j:slf4j-api` | 2.0.16 | azure/aws (1.7.x) vs google-cloud-storage (2.0.x) conflict |
+| `org.slf4j:slf4j-api` | 2.0.19 | azure/aws (1.7.x) vs google-cloud-storage (2.0.x) conflict |
 
 ## Netty Exclusion Strategy
 
@@ -101,7 +102,7 @@ Both the AWS and Azure SDKs default to Netty as their HTTP transport. This BOM s
 
 - **Azure**: Excludes `azure-core-http-netty`, replaced by `azure-core-http-jdk-httpclient` which uses Java's built-in `java.net.http.HttpClient` (available since Java 11). Zero additional dependencies.
 
-- **AWS**: Excludes `netty-nio-client` and `apache-client`, replaced by `aws-crt-client` (AWS Common Runtime). The CRT client provides both sync (`AwsCrtHttpClient`) and async (`AwsCrtAsyncHttpClient`) alternatives with improved S3 transfer reliability — it retries individual failed parts of a multipart transfer without restarting from the beginning, and includes enhanced connection pooling and DNS load balancing.
+- **AWS**: Excludes `netty-nio-client`, `apache-client` and `apache5-client` (the Apache HttpClient 5 transport that AWS SDK 2.54+ ships as its default sync client), replaced by `aws-crt-client` (AWS Common Runtime). The CRT client provides both sync (`AwsCrtHttpClient`) and async (`AwsCrtAsyncHttpClient`) alternatives with improved S3 transfer reliability — it retries individual failed parts of a multipart transfer without restarting from the beginning, and includes enhanced connection pooling and DNS load balancing.
 
 ## Verification Module
 
