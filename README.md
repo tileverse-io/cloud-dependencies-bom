@@ -18,7 +18,7 @@ This BOM provides a single source of truth for cloud storage SDK versions, Netty
     <dependency>
       <groupId>io.tileverse</groupId>
       <artifactId>cloud-dependencies-bom</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.1-SNAPSHOT</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -116,9 +116,9 @@ The module is:
 
 ## Versioning
 
-This project uses [Maven CI-friendly versioning](https://maven.apache.org/maven-ci-friendly.html). The version is defined by a single `${revision}` property in `pom.xml` (default: `1.0-SNAPSHOT`), and the `flatten-maven-plugin` resolves it to a concrete value in the published POM.
+This project uses [Maven CI-friendly versioning](https://maven.apache.org/maven-ci-friendly.html). The version is defined by a single `${revision}` property in `pom.xml` (default: `1.1-SNAPSHOT`), and the `flatten-maven-plugin` resolves it to a concrete value in the published POM.
 
-- **Snapshots**: Published automatically on every push to `main` using the default `${revision}` value (e.g., `1.0-SNAPSHOT`).
+- **Snapshots**: Published automatically on every push to `main` using the default `${revision}` value (e.g., `1.1-SNAPSHOT`).
 - **Releases**: The version is overridden at build time by passing `-Drevision=<version>` to Maven. The `publish-release.yml` workflow does this automatically by extracting the version from the git tag (e.g., tag `v1.0.0` sets `-Drevision=1.0.0`).
 
 To bump the snapshot version (e.g., after releasing 1.0.0), simply update the `<revision>` property in `pom.xml` to the next development version (e.g., `1.1-SNAPSHOT`).

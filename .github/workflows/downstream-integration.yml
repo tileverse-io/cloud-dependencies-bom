@@ -5,7 +5,7 @@ name: Downstream Integration
 # breaks a real consumer is caught before release. All jobs are secret-free:
 # tileverse and geowebcache use TestContainers; imageio-ext cog-azure/cog-gs read public COGs.
 #
-# Every downstream build passes -nsu so the locally-installed candidate (e.g. 1.0-SNAPSHOT) is
+# Every downstream build passes -nsu so the locally-installed candidate (e.g. 1.1-SNAPSHOT) is
 # used and not shadowed by a snapshot of the same version on Maven Central.
 
 on:
