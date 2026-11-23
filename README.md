@@ -109,14 +109,31 @@ Both the AWS and Azure SDKs default to Netty as their HTTP transport. This BOM s
 
 ## Verification Module
 
-The `verification/` submodule exists to make the `dependencyConvergence` enforcer rule actually work on this BOM.
+The `verification/` modules check that the managed SDKs resolve without conflicts and work at runtime. A BOM has no dependencies of its own, and a build of the BOM alone checks nothing. These modules declare dependencies on all managed SDK artifacts and run tests against them.
 
-A BOM only has `<dependencyManagement>` — no real `<dependencies>`. The enforcer's `dependencyConvergence` rule checks the *resolved* dependency tree, so it silently passes on the BOM itself since there's nothing to resolve. The verification module declares actual dependencies on all managed cloud SDK artifacts, giving the enforcer a real dependency tree to check for transitive version conflicts.
+Two modules run the same tests, kept in `verification/src/test/java`:
 
-The module is:
-- **Not published** — excluded from `central-publishing-maven-plugin` via `<excludeArtifacts>` and skips install/deploy
-- **Invisible to consumers** — `flattenMode=ossrh` strips `<modules>` from the deployed POM
-- **Automatically checked** — inherits the `dependencyConvergence` profile from the parent, so `make install` and `make lint` both verify convergence
+- `verification/standalone` uses this BOM alone, as GeoTools, GeoWebCache and imageio-ext do.
+- `verification/spring-boot` imports this BOM, then `spring-boot-dependencies`, as GeoServer Cloud does. Spring Boot's entries still apply to the transitive libraries not managed here. Keep its `spring-boot.version` in line with GeoServer Cloud.
+
+A round trip creates a bucket or container, writes an object, reads a byte range back, lists the objects and deletes them.
+
+| Test | Checks |
+|------|--------|
+| `TransportsTest` | Netty, the gRPC transport and the AWS Apache transports are off the classpath, `io.grpc.Context` is kept, the AWS SDK finds the CRT transport and Azure finds the JDK HttpClient transport |
+| `OfflineClientsTest` | The Data Lake and SSO clients build, and an Azure client secret credential fails with an exception rather than a linkage error |
+| `AwsS3IT` | S3 round trips on LocalStack with the CRT sync, async and S3 clients and with the default transport, and an STS `AssumeRole` call |
+| `AzureBlobIT` | A blob round trip and a batch delete on Azurite |
+| `GoogleCloudStorageIT` | A round trip on fake-gcs-server over the HTTP/JSON transport |
+
+The integration tests need Docker, and they fail when Docker is missing instead of being skipped. LocalStack stays on 3.2.0: its images released since March 2026 require an auth token. Azurite rejects service versions newer than its own, and an Azure SDK upgrade can require a newer Azurite image.
+
+The tests catch missing classes and broken transports. For example, excluding `grpc-api` from `google-cloud-storage` fails `GoogleCloudStorageIT` with `NoClassDefFoundError: io/grpc/Context`. A downgrade forced by Spring Boot fails them only when the older version breaks a call made by the tests: with OpenTelemetry 1.62.0 and gRPC 1.84.1 instead of 1.67.0 and 1.85.1, they still pass.
+
+The modules are:
+- **Not published**: excluded from `central-publishing-maven-plugin` via `<excludeArtifacts>`, and they skip install and deploy
+- **Invisible to consumers**: `flattenMode=ossrh` strips `<modules>` from the deployed POM
+- **Checked for convergence**: they inherit the `dependencyConvergence` profile and the banned dependencies rule from the parent
 
 ## Versioning
 
@@ -134,7 +151,7 @@ To bump the snapshot version (e.g., after releasing 1.0.0), simply update the `<
 1. Edit the `<properties>` section in `pom.xml` with the new SDK versions
 2. Run `make format` to sort the POM
 3. Run `make lint` to verify formatting
-4. Run `make install` to validate the BOM installs correctly
+4. Run `make verify` to check convergence, run the verification tests and install the BOM (needs Docker)
 5. Inspect `.flattened-pom.xml` to verify all properties are resolved
 
 ### 2. Update the README
@@ -172,10 +189,13 @@ make format
 # Check POM formatting
 make lint
 
-# Install BOM to local Maven repository
+# Install BOM to local Maven repository, without tests
 make install
 
-# Full verification (lint + install)
+# Run the verification tests (needs Docker)
+make test
+
+# Full verification: lint, tests and install (needs Docker)
 make verify
 
 # Show project information

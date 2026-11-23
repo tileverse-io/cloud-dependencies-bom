@@ -46,6 +46,6 @@ jobs:
 
     - name: Publish snapshot
       if: ${{ !contains(github.event.head_commit.message, '[skip-publish]') }}
-      run: ./mvnw deploy -Dgpg.skip=false -ntp
+      run: ./mvnw deploy -DskipTests -Dgpg.skip=false -ntp
       env:
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
