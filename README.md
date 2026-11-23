@@ -131,7 +131,7 @@ The integration tests need Docker, and they fail when Docker is missing instead 
 The tests catch missing classes and broken transports. For example, excluding `grpc-api` from `google-cloud-storage` fails `GoogleCloudStorageIT` with `NoClassDefFoundError: io/grpc/Context`. A downgrade forced by Spring Boot fails them only when the older version breaks a call made by the tests: with OpenTelemetry 1.62.0 and gRPC 1.84.1 instead of 1.67.0 and 1.85.1, they still pass.
 
 The modules are:
-- **Not published**: excluded from `central-publishing-maven-plugin` via `<excludeArtifacts>`, and they skip install and deploy
+- **Not published**: the publish workflows build the BOM alone (`--non-recursive`), because the signing and publishing plugins fail on modules without an artifact. The modules are also excluded from `central-publishing-maven-plugin` via `<excludeArtifacts>`, and they skip install and deploy
 - **Invisible to consumers**: `flattenMode=ossrh` strips `<modules>` from the deployed POM
 - **Checked for convergence**: they inherit the `dependencyConvergence` profile and the banned dependencies rule from the parent
 
