@@ -45,36 +45,38 @@ For snapshot versions, add the Central Portal Snapshots repository:
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `com.azure:azure-storage-blob` | 12.35.0 | Netty excluded |
-| `com.azure:azure-storage-blob-batch` | 12.31.0 | Netty excluded |
-| `com.azure:azure-storage-file-datalake` | 12.28.0 | Netty excluded |
+| `com.azure:azure-storage-blob` | 12.37.2 | Netty excluded |
+| `com.azure:azure-storage-blob-batch` | 12.33.2 | Netty excluded |
+| `com.azure:azure-storage-file-datalake` | 12.30.2 | Netty excluded |
 | `com.azure:azure-core-http-jdk-httpclient` | (from BOM) | JDK HttpClient replacement for Netty |
-| `com.azure:azure-identity` | 1.18.4 | Netty excluded |
+| `com.azure:azure-identity` | 1.19.0 | Netty excluded |
 
 ### AWS
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `software.amazon.awssdk:s3` | 2.54.16 | Netty and Apache HTTP excluded |
-| `software.amazon.awssdk:aws-crt-client` | 2.54.16 | CRT-based replacement for Netty (version from AWS SDK BOM) |
-| `software.amazon.awssdk:auth` | 2.54.16 | Version from AWS SDK BOM |
-| `software.amazon.awssdk:sts` | 2.54.16 | Netty and Apache HTTP excluded |
-| `software.amazon.awssdk:sso` | 2.54.16 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:s3` | 2.59.7 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:aws-crt-client` | 2.59.7 | CRT-based replacement for Netty (version from AWS SDK BOM) |
+| `software.amazon.awssdk:auth` | 2.59.7 | Version from AWS SDK BOM |
+| `software.amazon.awssdk:sts` | 2.59.7 | Netty and Apache HTTP excluded |
+| `software.amazon.awssdk:sso` | 2.59.7 | Netty and Apache HTTP excluded |
 
 ### Google Cloud Storage
 
 | Artifact | Version | Notes |
 |----------|---------|-------|
-| `com.google.cloud:google-cloud-storage-bom` | 2.73.0 | Imported BOM |
+| `com.google.cloud:google-cloud-storage-bom` | 2.79.0 | Imported BOM |
 
 ### Imported BOMs
 
 | BOM | Version | Notes |
 |-----|---------|-------|
-| `com.azure:azure-sdk-bom` | 1.3.8 | Azure SDK version management |
-| `com.fasterxml.jackson:jackson-bom` | 2.22.2 | Azure convergence fix |
-| `com.google.cloud:google-cloud-storage-bom` | 2.73.0 | GCS and transitive deps |
-| `software.amazon.awssdk:bom` | 2.54.16 | AWS SDK version management |
+| `com.azure:azure-sdk-bom` | 1.3.10 | Azure SDK version management |
+| `com.fasterxml.jackson:jackson-bom` | 2.23.0 | Azure convergence fix |
+| `io.opentelemetry:opentelemetry-bom` | 1.67.0 | Version used by google-cloud-storage, newer than Spring Boot's |
+| `io.grpc:grpc-bom` | 1.85.1 | Version used by google-cloud-storage, newer than Spring Boot's |
+| `com.google.cloud:google-cloud-storage-bom` | 2.79.0 | GCS and transitive deps |
+| `software.amazon.awssdk:bom` | 2.59.7 | AWS SDK version management |
 
 ### Dependency Convergence Overrides
 
@@ -83,8 +85,9 @@ For snapshot versions, add the Central Portal Snapshots repository:
 | `com.google.errorprone:error_prone_annotations` | 2.50.0 | caffeine vs google-cloud-storage conflict |
 | `net.java.dev.jna:jna` | 5.19.1 | azure-identity transitive conflict |
 | `net.java.dev.jna:jna-platform` | 5.19.1 | azure-identity transitive conflict |
-| `com.microsoft.azure:msal4j` | 1.23.1 | azure-identity vs msal4j-persistence-extension conflict |
-| `org.slf4j:slf4j-api` | 2.0.19 | azure/aws (1.7.x) vs google-cloud-storage (2.0.x) conflict |
+| `com.microsoft.azure:msal4j` | 1.26.0 | azure-identity vs msal4j-persistence-extension conflict |
+| `org.slf4j:slf4j-api` | 2.0.20 | azure/aws (1.7.x) vs google-cloud-storage (2.0.x) conflict |
+| `org.jspecify:jspecify` | 1.0.1 | azure-core -> reactor-core vs google-cloud-storage conflict |
 
 ## Netty Exclusion Strategy
 
