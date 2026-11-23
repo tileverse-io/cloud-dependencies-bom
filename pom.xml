@@ -582,6 +582,8 @@
           <waitMaxTime>3600</waitMaxTime>
           <excludeArtifacts>
             <excludeArtifact>cloud-dependencies-bom-verification</excludeArtifact>
+            <excludeArtifact>cloud-dependencies-bom-verification-standalone</excludeArtifact>
+            <excludeArtifact>cloud-dependencies-bom-verification-spring-boot</excludeArtifact>
           </excludeArtifacts>
         </configuration>
       </plugin>

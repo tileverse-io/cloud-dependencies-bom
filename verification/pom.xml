@@ -10,13 +10,55 @@
 
   <artifactId>cloud-dependencies-bom-verification</artifactId>
   <packaging>pom</packaging>
-  <name>Cloud Dependencies BOM - Dependency Convergence Verification</name>
-  <description>Internal module that declares actual dependencies on all managed cloud SDKs so the maven-enforcer-plugin dependencyConvergence rule can verify there are no transitive version conflicts. Not published.</description>
+  <name>Cloud Dependencies BOM - Verification</name>
+  <description>Internal modules that resolve the managed cloud SDKs, check their dependency convergence, and run them against storage emulators. Not published.</description>
+
+  <modules>
+    <module>standalone</module>
+    <module>spring-boot</module>
+  </modules>
 
   <properties>
     <maven.install.skip>true</maven.install.skip>
+    <maven.deploy.skip>true</maven.deploy.skip>
     <sortpom.skip>false</sortpom.skip>
+    <!-- the lowest Java version used by the projects importing this BOM -->
+    <maven.compiler.release>17</maven.compiler.release>
+
+    <junit.version>6.1.2</junit.version>
+    <assertj.version>3.27.7</assertj.version>
+    <testcontainers.version>2.0.5</testcontainers.version>
+    <fake-gcs-server-testcontainers.version>0.3.0</fake-gcs-server-testcontainers.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.aiven</groupId>
+        <artifactId>testcontainers-fake-gcs-server</artifactId>
+        <version>${fake-gcs-server-testcontainers.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- Azure -->
@@ -68,5 +110,84 @@
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-storage</artifactId>
     </dependency>
+
+    <!-- Tests -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-localstack</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-azure</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.aiven</groupId>
+      <artifactId>testcontainers-fake-gcs-server</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.15.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.5.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>3.5.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.4.2</version>
+          <configuration>
+            <!-- the modules have tests only -->
+            <skipIfEmpty>true</skipIfEmpty>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <!-- the standalone and spring-boot modules run the same tests, kept in this directory -->
+    <testSourceDirectory>${project.basedir}/../src/test/java</testSourceDirectory>
+  </build>
 </project>

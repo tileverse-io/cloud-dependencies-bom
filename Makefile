@@ -9,8 +9,9 @@ help:
 	@echo ""
 	@echo "Build targets:"
 	@echo "  clean         - Clean build artifacts"
-	@echo "  install       - Install BOM to local repository"
-	@echo "  verify        - Full verification (lint + validate)"
+	@echo "  install       - Install BOM to local repository, without tests"
+	@echo "  test          - Run the verification tests (needs Docker)"
+	@echo "  verify        - Full verification: lint, tests and install (needs Docker)"
 	@echo ""
 	@echo "Code quality targets:"
 	@echo "  format        - Sort POM file"
@@ -33,10 +34,15 @@ lint:
 
 .PHONY: install
 install:
-	./mvnw install -ntp
+	./mvnw install -ntp -DskipTests
+
+.PHONY: test
+test:
+	./mvnw verify -ntp
 
 .PHONY: verify
-verify: lint install
+verify: lint
+	./mvnw install -ntp
 
 .PHONY: info
 info:
